@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">ChatApp</string>
+    <string name="login">登录</string>
+    <string name="input_pwd_tip">请输入密码</string>
+    <string name="input_account_tip">请输入账号</string>
+    <string name="register_tip">没有账号？注册一个</string>
+    <string name="user">用户</string>
+    <string name="empty_tip">内容为空</string>
+    <string name="register">注册</string>
+    <string name="repeat_pwd">再次输入新密码</string>
+    <string name="input_pwd_help">密码为6–15位大小写字母或数字</string>
+    <string name="user_info">个人信息</string>
+    <string name="user_age">年龄</string>
+    <string name="user_gender">性别</string>
+    <string name="username">用户名</string>
+    <string name="send">发送</string>
+    <string name="cancel">取消</string>
+    <string name="take_photo">拍照</string>
+    <string name="confirm">确定</string>
+    <string name="welcome">欢迎</string>
+</resources>

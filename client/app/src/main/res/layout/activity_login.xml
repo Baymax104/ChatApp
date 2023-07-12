@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+                name="state"
+                type="com.baymax104.chatapp.view.LoginActivity.States" />
+        <variable
+                name="handler"
+                type="com.baymax104.chatapp.view.LoginActivity.Handler" />
+    </data>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/white"
+            tools:context=".view.my.login.LoginActivity"
+            tools:ignore="ContentDescription">
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true">
+
+            <androidx.appcompat.widget.Toolbar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:id="@id/base_toolbar"
+                    android:fitsSystemWindows="true">
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/login"
+                        style="@style/CommonToolbarTitleStyle"/>
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:layout_marginTop="80dp"
+                android:layout_marginBottom="50dp"
+                android:gravity="center"
+                android:fontFamily="@font/normal"
+                android:textSize="30sp"
+                android:textColor="@color/main_color"
+                android:textStyle="bold"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/input_account_tip"
+                style="@style/TextInputEditStyle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    tools:ignore="SpeakableTextPresentCheck"
+                    android:text="@{state.account}"
+                    android:afterTextChanged="@{handler.setAccount}"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/input_pwd_tip"
+                app:passwordToggleEnabled="true"
+                style="@style/TextInputEditStyle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    tools:ignore="SpeakableTextPresentCheck"
+                    android:text="@{state.password}"
+                    android:afterTextChanged="@{handler.setPassword}"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="30dp"
+                android:background="@drawable/button_bg"
+                android:text="@string/login"
+                style="@style/BigButtonTextStyle"
+                android:id="@+id/login"
+                android:onClick="@{handler.login}"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/register_tip"
+                android:layout_gravity="center_horizontal"
+                android:padding="6dp"
+                android:fontFamily="@font/normal"
+                android:textSize="16sp"
+                android:textColor="@color/gray_1"
+                android:id="@+id/register_entry"
+                android:onClick="@{handler.register}"/>
+    </LinearLayout>
+</layout>

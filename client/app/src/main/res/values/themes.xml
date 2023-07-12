@@ -1,0 +1,110 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.ChatApp" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/main_color</item>
+        <item name="colorPrimaryVariant">@color/main_variant_color</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/bar_color</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!--字体样式-->
+    <!--带特殊布局的ToolBar标题样式-->
+    <style name="ToolbarTitleStyle">
+        <item name="android:fontFamily">@font/normal</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--带返回键的ToolBar标题样式-->
+    <style name="CommonToolbarTitleStyle" parent="ToolbarTitleStyle">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!--卡片列表项title样式-->
+    <style name="ItemTitleStyle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <!--Tab文字样式-->
+    <style name="TabTextStyle">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+
+    <!--个人资料页面文字样式-->
+    <style name="UserInfoTextStyle">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!--对话框按钮文字样式-->
+    <style name="DialogButtonTextStyle">
+        <item name="android:fontFamily">@font/normal</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="DialogContentTextStyle">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <!--ToolBar确定按钮文字样式-->
+    <style name="ToolbarOptionTextStyle">
+        <item name="android:fontFamily">@font/normal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginEnd">15dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!--TextInputLayout输入框样式-->
+    <style name="TextInputEditStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusBottomEnd">15dp</item>
+        <item name="boxCornerRadiusBottomStart">15dp</item>
+        <item name="boxCornerRadiusTopEnd">15dp</item>
+        <item name="boxCornerRadiusTopStart">15dp</item>
+    </style>
+
+    <style name="SmallTextInputEditStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+    </style>
+
+    <style name="ButtonTextStyle">
+        <item name="android:fontFamily">@font/normal</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="BigButtonTextStyle" parent="ButtonTextStyle">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="SmallButtonTextStyle" parent="ButtonTextStyle">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="CollapsedToolbarTitleStyle">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="ExpandedToolbarTitleStyle">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+
+
+</resources>

@@ -1,0 +1,14 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.ChatApp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/main_color</item>
+        <item name="colorPrimaryVariant">@color/main_variant_color</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/bar_color</item>
+        <!-- Customize your theme here. -->
+    </style>
+</resources>

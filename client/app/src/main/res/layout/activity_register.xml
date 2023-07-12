@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+                name="state"
+                type="com.baymax104.chatapp.view.RegisterActivity.States" />
+        <variable
+                name="handler"
+                type="com.baymax104.chatapp.view.RegisterActivity.Handler" />
+    </data>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".view.RegisterActivity">
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true">
+            <androidx.appcompat.widget.Toolbar
+                    android:layout_width="match_parent"
+                    android:layout_height="?actionBarSize"
+                    android:background="@color/bar_color"
+                    android:id="@id/base_toolbar">
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@string/register"
+                        style="@style/CommonToolbarTitleStyle"/>
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                tools:ignore="ContentDescription">
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    android:layout_marginTop="80dp"
+                    android:layout_marginBottom="30dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/normal"
+                    android:textSize="30sp"
+                    android:textColor="@color/main_color"
+                    android:textStyle="bold"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginHorizontal="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/input_account_tip"
+                    style="@style/TextInputEditStyle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="phone"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        tools:ignore="SpeakableTextPresentCheck"
+                        android:text="@{state.account}"
+                        android:afterTextChanged="@{handler.setAccount}"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginHorizontal="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/input_pwd_tip"
+                    app:helperTextEnabled="true"
+                    app:helperText="@string/input_pwd_help"
+                    app:passwordToggleEnabled="true"
+                    style="@style/TextInputEditStyle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        tools:ignore="SpeakableTextPresentCheck"
+                        android:text="@{state.password}"
+                        android:afterTextChanged="@{handler.setPassword}"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginHorizontal="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/repeat_pwd"
+                    app:passwordToggleEnabled="true"
+                    style="@style/TextInputEditStyle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        tools:ignore="SpeakableTextPresentCheck"
+                        android:text="@{state.repeat}"
+                        android:afterTextChanged="@{handler.setRepeat}"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginHorizontal="30dp"
+                    android:background="@drawable/button_bg"
+                    android:text="@string/register"
+                    style="@style/BigButtonTextStyle"
+                    android:id="@+id/register"
+                    android:onClick="@{handler.register}"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

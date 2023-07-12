@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="state"
+                type="com.baymax104.chatapp.view.InfoActivity.States" />
+        <variable
+                name="handler"
+                type="com.baymax104.chatapp.view.InfoActivity.Handler" />
+    </data>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".view.InfoActivity">
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true">
+            <androidx.appcompat.widget.Toolbar
+                    android:layout_width="match_parent"
+                    android:layout_height="?actionBarSize"
+                    android:background="@color/bar_color"
+                    android:id="@id/base_toolbar">
+                <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/user_info"
+                            style="@style/CommonToolbarTitleStyle"
+                            android:layout_alignParentStart="true"/>
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/confirm"
+                            style="@style/ToolbarOptionTextStyle"
+                            android:id="@+id/confirm"
+                            android:textColor="@color/red"
+                            android:layout_alignParentEnd="true"
+                            android:onClick="@{handler.confirm}"
+                            tools:ignore="RelativeOverlap" />
+
+                </RelativeLayout>
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="@{`用户ID：`+state.user.id}"
+                android:gravity="start"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginHorizontal="30dp"
+                android:paddingHorizontal="15dp"
+                android:textSize="17sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/normal"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{`账号：`+state.user.account}"
+                android:gravity="start"
+                android:layout_marginBottom="10dp"
+                android:layout_marginHorizontal="30dp"
+                android:paddingHorizontal="15dp"
+                android:textSize="17sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/normal"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/username"
+                style="@style/TextInputEditStyle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    tools:ignore="SpeakableTextPresentCheck"
+                    android:text="@{state.user.username}"
+                    android:afterTextChanged="@{handler.setUsername}"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/user_gender"
+                style="@style/TextInputEditStyle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    tools:ignore="SpeakableTextPresentCheck"
+                    android:text="@{state.user.gender}"
+                    android:afterTextChanged="@{handler.setGender}"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/user_age"
+                style="@style/TextInputEditStyle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    tools:ignore="SpeakableTextPresentCheck"
+                    android:text="@{state.user.age}"
+                    android:afterTextChanged="@{handler.setAge}"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+</layout>

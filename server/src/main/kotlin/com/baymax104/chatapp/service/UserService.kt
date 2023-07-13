@@ -73,4 +73,14 @@ class UserService {
         return Response("success", "200", body = Unit)
     }
 
+    @PathMapping("/chat/text")
+    fun chatText(content: String): Response<String> {
+        return Response("success", "200", body = content)
+    }
+
+    @PathMapping("/chat/image")
+    fun chatImage(image: ByteArray): Response<ByteArray> {
+        return Response("success", "200", body = image)
+    }
+
 }

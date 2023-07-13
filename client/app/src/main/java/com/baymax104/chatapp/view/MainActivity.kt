@@ -87,6 +87,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             }
         }
 
+        infoMessenger.update.observeSend(this) {
+            requester.getOnline {
+                success {
+                    states.users.value = it
+                    states.isUsersEmpty.value = it.isEmpty()
+                }
+                fail { ToastUtils.showShort(it) }
+            }
+        }
+
         // 若从登录页跳转，则后台协程已创建，否则验证登录，同时建立连接
         requester.login(UserStore.account, UserStore.password) {
             success { UserStore.user = it }

@@ -118,4 +118,20 @@ object WebService {
         }
     }
 
+    fun send(request: Request<Any>) {
+        val json = Parser.encode(request)
+        LogUtils.iTag("chat-web", json)
+        if (CoroutineHolder.coroutine == null) return
+        mainLaunch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    val socket = CoroutineHolder.coroutine!!.socket
+                    IOUtil.write(json, socket.getOutputStream())
+                }
+            }.onFailure {
+                LogUtils.eTag("chat-web", it.message ?: "request Error")
+            }
+        }
+    }
+
 }

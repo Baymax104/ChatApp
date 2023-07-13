@@ -34,6 +34,7 @@ class InfoActivity : BaseActivity<ActivityInfoBinding>() {
 
     class Messenger : MessageHolder() {
         val show = Event<User, Unit>()
+        val update = Event<Unit, Unit>()
     }
 
     inner class Handler {
@@ -42,6 +43,7 @@ class InfoActivity : BaseActivity<ActivityInfoBinding>() {
             requester.updateInfo(states.user.value) {
                 success {
                     UserStore.setUserInfo(states.user.value)
+                    messenger.update.send(Unit)
                     finish()
                 }
                 fail { ToastUtils.showShort(it) }

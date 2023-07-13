@@ -29,6 +29,10 @@ abstract class Requester : ViewModel(), NetLifeCycle {
         @JvmField var onFail: (String) -> Unit = {}
         @JvmField var lifeCycle: NetLifeCycle = NoNetLifeCycle
 
+        companion object {
+            inline fun <E> build(block: ReqCallback<E>.() -> Unit) = ReqCallback<E>().apply(block)
+        }
+
         fun success(block: (E) -> Unit) = apply { onSuccess = block }
         fun fail(block: (String) -> Unit) = apply { onFail = block }
         fun lifecycle(owner: NetLifeCycle) = apply { lifeCycle = owner }

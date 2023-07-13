@@ -46,7 +46,11 @@ class UserRequester : Requester() {
 
     fun getOnline(block: ReqCallback<List<User>>.() -> Unit) {
         val callback = ReqCallback<List<User>>().apply(block)
-        val request = Request<Any>("/online", src = UserStore.id.toString())
+        val request = Request<Any>(
+            "/online",
+            src = UserStore.id.toString(),
+            dest = UserStore.id.toString()
+        )
         WebService.request(request) {
             success { it -> Parser.transform<List<User>>(it.body).let { callback.onSuccess(it) } }
             fail { callback.onFail(it) }
@@ -55,7 +59,11 @@ class UserRequester : Requester() {
 
     fun updateInfo(user: User, block: ReqCallback<Any>.() -> Unit) {
         val callback = ReqCallback<Any>().apply(block)
-        val request = Request("/update", src = UserStore.id.toString(), body = user)
+        val request = Request("/update",
+            src = UserStore.id.toString(),
+            dest = UserStore.id.toString(),
+            body = user
+        )
         val req = Parser.transform<Request<Any>>(request)
         WebService.request(req) {
             success { it -> Parser.transform<Any>(it.body).let { callback.onSuccess(it) } }
@@ -63,11 +71,19 @@ class UserRequester : Requester() {
         }
     }
 
-    fun chatImage(file: File, block: ReqCallback<Any>.() -> Unit) {
-        val callback = ReqCallback<Any>().apply(block)
+    fun chatText(content: String, userId: Int) {
+        val request = Request(
+            "/chat/text",
+            src = UserStore.id.toString(),
+            dest = userId.toString(),
+            body = content
+        )
+        val req = Parser.transform<Request<Any>>(request)
+        WebService.send(req)
+    }
 
+    fun chatImage(file: File, userId: Int) {
         val bytes = FileIOUtils.readFile2BytesByStream(file)!!
 
-//        val request = Request("/chat", src = UserStore.id, )
     }
 }

@@ -10,20 +10,25 @@ import com.baymax104.basemvvm.utils.registerLauncher
 import com.baymax104.basemvvm.view.BaseActivity
 import com.baymax104.basemvvm.view.ViewConfig
 import com.baymax104.basemvvm.vm.MessageHolder
+import com.baymax104.basemvvm.vm.Requester
 import com.baymax104.basemvvm.vm.State
 import com.baymax104.basemvvm.vm.StateHolder
-import com.baymax104.basemvvm.vm.activityViewModels
 import com.baymax104.basemvvm.vm.applicationViewModels
 import com.baymax104.chatapp.BR
 import com.baymax104.chatapp.R
 import com.baymax104.chatapp.adapter.MessageAdapter
 import com.baymax104.chatapp.databinding.ActivityChatBinding
+import com.baymax104.chatapp.entity.ChatDirection.REPLY
 import com.baymax104.chatapp.entity.ChatDirection.SEND
 import com.baymax104.chatapp.entity.ChatMessage
 import com.baymax104.chatapp.entity.ChatType.IMAGE
 import com.baymax104.chatapp.entity.ChatType.TEXT
 import com.baymax104.chatapp.entity.User
+import com.baymax104.chatapp.repository.CoroutineHolder
+import com.baymax104.chatapp.repository.UserStore
+import com.baymax104.chatapp.service.UserRequester
 import com.baymax104.chatapp.utils.CameraUtil
+import com.baymax104.chatapp.utils.Parser
 import com.baymax104.chatapp.utils.create
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.UriUtils
@@ -34,11 +39,13 @@ import com.blankj.utilcode.util.UriUtils
  */
 class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
-    private val states by activityViewModels<States>()
+    private val states by applicationViewModels<States>()
 
     private val messenger by applicationViewModels<Messenger>()
 
     private val moreMessenger by applicationViewModels<ChatMoreDialog.Messenger>()
+
+    private val requester by applicationViewModels<UserRequester>()
 
     private val photoLauncher = registerLauncher {
         val file = UriUtils.uri2File(states.photo) ?: return@registerLauncher
@@ -65,14 +72,14 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         val send = OnClickListener {
             val content = states.content.value
             if (content.isNotEmpty()) {
-                val message = ChatMessage("lalala", content, SEND, TEXT)
+                requester.chatText(content, states.user.value.id)
+                val message = ChatMessage(UserStore.username, content, SEND, TEXT)
                 states.messages.value.apply { add(message) }.let { states.messages.value = it }
                 states.content.value = ""
             }
         }
 
         val more = OnClickListener { create(ChatMoreDialog::class).show() }
-
         val setContent = AfterTextChanged { states.content.value = it.toString() }
     }
 
@@ -93,6 +100,15 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                 .granted { takePhoto() }
                 .denied { ToastUtils.showShort("权限申请失败，请到权限中心开启权限") }
                 .request()
+        }
+
+        CoroutineHolder.coroutine!!.callback = Requester.ReqCallback.build {
+            success { it ->
+                val content = Parser.transform<String>(it.body)
+                val message = ChatMessage(states.user.value.username, content, REPLY, TEXT)
+                states.messages.value.apply { add(message) }.let { states.messages.value = it }
+            }
+            fail { ToastUtils.showShort("消息接收失败") }
         }
     }
 

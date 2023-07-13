@@ -5,14 +5,18 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View.OnClickListener
 import androidx.databinding.adapters.TextViewBindingAdapter.AfterTextChanged
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.baymax104.basemvvm.utils.Permission
 import com.baymax104.basemvvm.utils.registerLauncher
 import com.baymax104.basemvvm.view.BaseActivity
 import com.baymax104.basemvvm.view.ViewConfig
 import com.baymax104.basemvvm.vm.MessageHolder
 import com.baymax104.basemvvm.vm.Requester
+import com.baymax104.basemvvm.vm.Requester.*
 import com.baymax104.basemvvm.vm.State
 import com.baymax104.basemvvm.vm.StateHolder
+import com.baymax104.basemvvm.vm.activityViewModels
 import com.baymax104.basemvvm.vm.applicationViewModels
 import com.baymax104.chatapp.BR
 import com.baymax104.chatapp.R
@@ -24,12 +28,15 @@ import com.baymax104.chatapp.entity.ChatMessage
 import com.baymax104.chatapp.entity.ChatType.IMAGE
 import com.baymax104.chatapp.entity.ChatType.TEXT
 import com.baymax104.chatapp.entity.User
+import com.baymax104.chatapp.repository.ChatMap
 import com.baymax104.chatapp.repository.CoroutineHolder
 import com.baymax104.chatapp.repository.UserStore
 import com.baymax104.chatapp.service.UserRequester
 import com.baymax104.chatapp.utils.CameraUtil
 import com.baymax104.chatapp.utils.Parser
 import com.baymax104.chatapp.utils.create
+import com.blankj.utilcode.util.FileIOUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.UriUtils
 
@@ -39,7 +46,7 @@ import com.blankj.utilcode.util.UriUtils
  */
 class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
-    private val states by applicationViewModels<States>()
+    private val states by activityViewModels<States>()
 
     private val messenger by applicationViewModels<Messenger>()
 
@@ -50,8 +57,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private val photoLauncher = registerLauncher {
         val file = UriUtils.uri2File(states.photo) ?: return@registerLauncher
         CameraUtil.compress(this, file) { f ->
+            requester.chatImage(f, states.user.value.id)
             val uri = Uri.fromFile(f)?.toString() ?: return@compress
-            val message = ChatMessage("lalala", uri, SEND, IMAGE)
+            val message = ChatMessage(UserStore.username, uri, SEND, IMAGE)
             states.messages.value.apply { add(message) }.let { states.messages.value = it }
         }
     }
@@ -60,6 +68,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         val user = State(User())
         val messages = State<MutableList<ChatMessage>>(mutableListOf())
         val content = State("")
+        val isForeground = State(false)
         var photo: Uri? = null
     }
 
@@ -93,7 +102,19 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        messenger.user.observeSend(this, true) { states.user.value = it }
+
+        lifecycle.addObserver(LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> states.isForeground.value = true
+                Lifecycle.Event.ON_STOP -> states.isForeground.value = false
+                else -> {}
+            }
+        })
+
+        messenger.user.observeSend(this, true) {
+            states.user.value = it
+            states.messages.value = ChatMap[it.id] ?: mutableListOf()
+        }
 
         moreMessenger.action.observeSend(this) {
             Permission.permission(Manifest.permission.CAMERA)
@@ -102,13 +123,27 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                 .request()
         }
 
-        CoroutineHolder.coroutine!!.callback = Requester.ReqCallback.build {
+        CoroutineHolder.coroutine!!.registerCallback("/chat/text") {
             success { it ->
-                val content = Parser.transform<String>(it.body)
-                val message = ChatMessage(states.user.value.username, content, REPLY, TEXT)
-                states.messages.value.apply { add(message) }.let { states.messages.value = it }
+                if (states.isForeground.value) {
+                    val message = ChatMessage(states.user.value.username, Parser.transform(it.body), REPLY, TEXT)
+                    states.messages.value.apply { add(message) }.let { states.messages.value = it }
+                }
             }
-            fail { ToastUtils.showShort("消息接收失败") }
+            fail { ToastUtils.showShort("消息文本接收失败") }
+        }
+
+        CoroutineHolder.coroutine!!.registerCallback("/chat/image") {
+            success { it ->
+                if (states.isForeground.value) {
+                    val bytes = Parser.transform<ByteArray>(it.body)
+                    val file = CameraUtil.bytesToFile(bytes) ?: return@success
+                    val uri = Uri.fromFile(file)?.toString() ?: return@success
+                    val message = ChatMessage(states.user.value.username, uri, REPLY, IMAGE)
+                    states.messages.value.apply { add(message) }.let { states.messages.value = it }
+                }
+            }
+            fail { ToastUtils.showShort("消息文本接收失败") }
         }
     }
 

@@ -118,4 +118,16 @@ object CameraUtil {
             .launch()
 
     }
+
+    /**
+     * 将Byte数组转换为File
+     * @param byteArray Byte数组
+     * @return [File]
+     */
+    fun bytesToFile(byteArray: ByteArray, fileDir: Boolean = false): File? {
+        val file = createNewFile(fileDir) ?: return null
+        return if (FileIOUtils.writeFileFromBytesByStream(file, byteArray)) {
+            file
+        } else null
+    }
 }

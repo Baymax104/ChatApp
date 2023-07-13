@@ -16,14 +16,10 @@ class UserRequester : Requester() {
 
     fun login(account: String, password: String, block: ReqCallback<User>.() -> Unit) {
         val callback = ReqCallback<User>().apply(block)
-
-        val map = mapOf(
-            "account" to account,
-            "password" to password
-        )
+        val map = mapOf("account" to account, "password" to password)
         val request = Request("/login", body = map)
-        val req = Parser.transform<Request<Any>>(request)
-        WebService.requestOnce(req) {
+            .let { Parser.transform<Request<Any>>(it) }
+        WebService.requestOnce(request) {
             success { it -> Parser.transform<User>(it.body).let { callback.onSuccess(it) } }
             fail { callback.onFail(it) }
         }
@@ -31,14 +27,10 @@ class UserRequester : Requester() {
 
     fun register(account: String, password: String, block: ReqCallback<Any>.() -> Unit) {
         val callback = ReqCallback<Any>().apply(block)
-
-        val map = mapOf(
-            "account" to account,
-            "password" to password
-        )
+        val map = mapOf("account" to account, "password" to password)
         val request = Request("/register", body = map)
-        val req = Parser.transform<Request<Any>>(request)
-        WebService.requestOnce(req) {
+            .let { Parser.transform<Request<Any>>(it) }
+        WebService.requestOnce(request) {
             success { it -> Parser.transform<Any>(it.body).let { callback.onSuccess(it) } }
             fail { callback.onFail(it) }
         }
@@ -59,31 +51,37 @@ class UserRequester : Requester() {
 
     fun updateInfo(user: User, block: ReqCallback<Any>.() -> Unit) {
         val callback = ReqCallback<Any>().apply(block)
-        val request = Request("/update",
+        val request = Request(
+            "/update",
             src = UserStore.id.toString(),
             dest = UserStore.id.toString(),
             body = user
-        )
-        val req = Parser.transform<Request<Any>>(request)
-        WebService.request(req) {
+        ).let { Parser.transform<Request<Any>>(it) }
+        WebService.request(request) {
             success { it -> Parser.transform<Any>(it.body).let { callback.onSuccess(it) } }
             fail { callback.onFail(it) }
         }
     }
 
     fun chatText(content: String, userId: Int) {
-        val request = Request(
+        Request(
             "/chat/text",
             src = UserStore.id.toString(),
             dest = userId.toString(),
             body = content
-        )
-        val req = Parser.transform<Request<Any>>(request)
-        WebService.send(req)
+        ).let { Parser.transform<Request<Any>>(it) }
+            .let { WebService.send(it) }
     }
 
     fun chatImage(file: File, userId: Int) {
         val bytes = FileIOUtils.readFile2BytesByStream(file)!!
+        Request(
+            "/chat/image",
+            src = UserStore.id.toString(),
+            dest = userId.toString(),
+            body = bytes
+        ).let { Parser.transform<Request<Any>>(it) }
+            .let { WebService.send(it) }
 
     }
 }

@@ -18,10 +18,11 @@ class Response<E>() {
     var path: String = ""
     var body: E? = null
 
-    constructor(status: String, code: String, message: String = "", body: E? = null) : this() {
+    constructor(status: String, code: String, message: String = "", path: String = "", body: E? = null) : this() {
         this.status = status
         this.code = code
         this.message = message
+        this.path = path
         this.body = body
     }
 

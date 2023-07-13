@@ -38,14 +38,14 @@ class Application {
      * 监听端口
      */
     fun listen(): Unit = try {
-        log.info("Application listening...")
+        log.info("Application is listening at 6666 port...")
         ServerSocket(6666).use { server ->
             while (true) {
                 // listening...
                 val socket = server.accept()
                 val json = IOUtil.read(socket.getInputStream())
                 val request = Parser.decode<Request<Any>>(json)
-                log.info("accept request ${request.timestamp}, current thread map: $ThreadMap")
+                log.info("accept in main, current thread map: $ThreadMap")
                 mainDispatcher.dispatch(request, socket)
             }
         }

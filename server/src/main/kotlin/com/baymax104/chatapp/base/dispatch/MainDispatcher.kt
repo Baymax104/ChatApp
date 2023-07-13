@@ -27,7 +27,7 @@ class MainDispatcher(val ioc: IOC) {
         val map = Parser.transform<Map<String, String>>(request.body)
         val res = service.login(map)
         val response: Response<Any> = with(res) {
-            Response(status, code, message, Parser.transform<Any>(res.body))
+            Response(status, code, message, path, Parser.transform<Any>(res.body))
         }
         val json = Parser.encode(response)
         IOUtil.write(json, socket.getOutputStream())
@@ -47,7 +47,7 @@ class MainDispatcher(val ioc: IOC) {
         val map = Parser.decode<Map<String, String>>(Parser.encode(request.body))
         val res = service.register(map)
         val response: Response<Any> = with(res) {
-            Response(status, code, message, Parser.transform<Any>(res.body))
+            Response(status, code, message, path, Parser.transform<Any>(res.body))
         }
         val json = Parser.encode(response)
         IOUtil.write(json, socket.getOutputStream())

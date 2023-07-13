@@ -11,6 +11,7 @@ import com.baymax104.chatapp.utils.IOUtil
 import com.baymax104.chatapp.utils.Parser
 import com.baymax104.chatapp.utils.mainLaunch
 import com.blankj.utilcode.util.LogUtils
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetAddress
@@ -39,7 +40,6 @@ object WebService {
             callback.onSuccess(Response("success", "200", body = UserStore.user))
             return@mainLaunch
         }
-        LogUtils.iTag("chat-web", json)
         try {
             val response = withContext(Dispatchers.IO) {
                 val socket = Socket(InetAddress.getByName(AppKey.SERVER_IP), AppKey.SERVER_PORT)
@@ -47,10 +47,11 @@ object WebService {
 
                 // 注册和登录是客户端与服务端主线程通信，且都是及时回复
                 IOUtil.write(json, socket.getOutputStream())
+                LogUtils.iTag("chat-web", "request {src=${request.src}, dest=${request.dest}, path=${request.path}}")
                 // 等待Server回复
                 val res = IOUtil.read(socket.getInputStream())
                 val response = Parser.decode<Response<Any>>(res)
-
+                LogUtils.iTag("chat-web", "accept {status=${response.status}, path=${response.path}, src=${response.src}, dest=${response.dest}}")
                 if (response.status != "success") {
                     throw Exception("Error${response.code}: ${response.message}")
                 }
@@ -78,15 +79,15 @@ object WebService {
      */
     fun request(request: Request<Any>, block: ReqCallback<Response<Any>>.() -> Unit) {
         val json = Parser.encode(request)
-        LogUtils.iTag("chat-web", json)
         val callback = ReqCallback<Response<Any>>().apply(block)
         if (CoroutineHolder.coroutine == null) return
         mainLaunch {
             runCatching {
                 withContext(Dispatchers.IO) {
-                    CoroutineHolder.coroutine!!.callback = callback
+                    CoroutineHolder.coroutine!!.registerCallback(request.path, callback)
                     val socket = CoroutineHolder.coroutine!!.socket
                     IOUtil.write(json, socket.getOutputStream())
+                    LogUtils.iTag("chat-web", "request {src=${request.src}, dest=${request.dest}, path=${request.path}}")
                 }
             }.onFailure {
                 callback.onFail(it.message ?: "request Error")
@@ -101,17 +102,14 @@ object WebService {
     fun exit() {
         val request = Request<Any>("/exit", src = UserStore.id.toString())
         val json = Parser.encode(request)
-        LogUtils.iTag("chat-web", json)
         mainLaunch {
             runCatching {
                 withContext(Dispatchers.IO) {
-                    CoroutineHolder.coroutine!!.callback = null
+                    CoroutineHolder.coroutine!!.callbacks.clear()
                     val socket = CoroutineHolder.coroutine!!.socket
                     IOUtil.write(json, socket.getOutputStream())
-                    socket.close()
+                    LogUtils.iTag("chat-web", "request {src=${request.src}, dest=${request.dest}, path=${request.path}}")
                 }
-                CoroutineHolder.coroutine!!.stop()
-                CoroutineHolder.coroutine = null
             }.onFailure {
                 LogUtils.eTag("chat-web", it.message ?: "request Error")
             }
@@ -120,13 +118,13 @@ object WebService {
 
     fun send(request: Request<Any>) {
         val json = Parser.encode(request)
-        LogUtils.iTag("chat-web", json)
         if (CoroutineHolder.coroutine == null) return
         mainLaunch {
             runCatching {
                 withContext(Dispatchers.IO) {
                     val socket = CoroutineHolder.coroutine!!.socket
                     IOUtil.write(json, socket.getOutputStream())
+                    LogUtils.iTag("chat-web", "request {src=${request.src}, dest=${request.dest}, path=${request.path}}")
                 }
             }.onFailure {
                 LogUtils.eTag("chat-web", it.message ?: "request Error")

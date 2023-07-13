@@ -26,7 +26,7 @@ class UserService {
         }
 
         val userDTO = UserDTO(user)
-        return Response("success", "200", body = userDTO)
+        return Response("success", "200", path = "/login", body = userDTO)
     }
 
     fun register(map: Map<String, String>): Response<Any> {
@@ -48,7 +48,7 @@ class UserService {
             return Response("error", "2001", "用户注册失败")
         }
 
-        return Response("success", "200", body = Unit)
+        return Response("success", "200", path = "/register", body = Unit)
     }
 
     @PathMapping("/online")
@@ -57,7 +57,7 @@ class UserService {
         val users = database.users
             .filter { it.id inList ids }
             .map { UserDTO(it) }
-        return Response("success", "200", body = users)
+        return Response("success", "200", path = "/online", body = users)
     }
 
     @PathMapping("/update")
@@ -70,17 +70,17 @@ class UserService {
             gender = newUser.gender
         }
         user.flushChanges()
-        return Response("success", "200", body = Unit)
+        return Response("success", "200", path = "/update", body = Unit)
     }
 
     @PathMapping("/chat/text")
     fun chatText(content: String): Response<String> {
-        return Response("success", "200", body = content)
+        return Response("success", "200", path = "/chat/text", body = content)
     }
 
     @PathMapping("/chat/image")
     fun chatImage(image: ByteArray): Response<ByteArray> {
-        return Response("success", "200", body = image)
+        return Response("success", "200", path = "/chat/image", body = image)
     }
 
 }

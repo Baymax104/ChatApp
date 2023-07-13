@@ -1,9 +1,12 @@
 package com.baymax104.chatapp.view
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.baymax104.basemvvm.utils.actionStart
 import com.baymax104.basemvvm.view.ActivityStack
 import com.baymax104.basemvvm.view.BaseActivity
@@ -19,16 +22,24 @@ import com.baymax104.chatapp.BR
 import com.baymax104.chatapp.R
 import com.baymax104.chatapp.adapter.OnlineUserAdapter
 import com.baymax104.chatapp.databinding.ActivityMainBinding
+import com.baymax104.chatapp.entity.ChatDirection
+import com.baymax104.chatapp.entity.ChatMessage
+import com.baymax104.chatapp.entity.ChatType
 import com.baymax104.chatapp.entity.User
+import com.baymax104.chatapp.repository.ChatMap
+import com.baymax104.chatapp.repository.CoroutineHolder
 import com.baymax104.chatapp.repository.UserStore
 import com.baymax104.chatapp.service.UserRequester
 import com.baymax104.chatapp.service.WebService
+import com.baymax104.chatapp.utils.CameraUtil
+import com.baymax104.chatapp.utils.Parser
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
-    private val states by activityViewModels<States>()
+    private val states by applicationViewModels<States>()
     private val chatMessenger by applicationViewModels<ChatActivity.Messenger>()
     private val requester by applicationViewModels<UserRequester>()
     private val infoMessenger by applicationViewModels<InfoActivity.Messenger>()
@@ -36,6 +47,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     class States : StateHolder() {
         val users = State<List<User>>(listOf())
         val isUsersEmpty = State(true)
+        val username = State("")
+        val isForeground = State(false)
     }
 
     inner class Handler {
@@ -53,6 +66,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 success {
                     states.users.value = it
                     states.isUsersEmpty.value = it.isEmpty()
+                    ChatMap.init(it)
                     layout.finishRefresh()
                 }
                 fail { ToastUtils.showShort(it) }
@@ -75,12 +89,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        lifecycle.addObserver(LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> states.isForeground.value = true
+                Lifecycle.Event.ON_STOP -> states.isForeground.value = false
+                else -> {}
+            }
+        })
+
         UserStore.userLoginEvent.observeSend(this, true) { it ->
             if (it) {
+                states.username.value = UserStore.username
                 requester.getOnline {
                     success {
                         states.users.value = it
                         states.isUsersEmpty.value = it.isEmpty()
+                        ChatMap.init(it)
+                        listenChat()
                     }
                     fail { ToastUtils.showShort(it) }
                 }
@@ -88,10 +113,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         infoMessenger.update.observeSend(this) {
+            states.username.value = UserStore.username
             requester.getOnline {
                 success {
                     states.users.value = it
                     states.isUsersEmpty.value = it.isEmpty()
+                    ChatMap.init(it)
                 }
                 fail { ToastUtils.showShort(it) }
             }
@@ -106,6 +133,34 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             }
         }
 
+    }
+
+    private fun listenChat() {
+
+        CoroutineHolder.coroutine!!.registerCallback("/chat/text") {
+            success { response ->
+                if (states.isForeground.value) {
+                    val user = states.users.value.find { it.id == response.dest.toInt() } ?: return@success
+                    val message = ChatMessage(user.username, Parser.transform(response.body), ChatDirection.REPLY, ChatType.TEXT)
+                    ChatMap[user.id]?.apply { add(message) }
+                }
+            }
+            fail { ToastUtils.showShort("消息文本接收失败") }
+        }
+
+        CoroutineHolder.coroutine!!.registerCallback("/chat/image") {
+            success { response ->
+                if (states.isForeground.value) {
+                    val user = states.users.value.find { it.id == response.dest.toInt() } ?: return@success
+                    val bytes = Parser.transform<ByteArray>(response.body)
+                    val file = CameraUtil.bytesToFile(bytes) ?: return@success
+                    val uri = Uri.fromFile(file)?.toString() ?: return@success
+                    val message = ChatMessage(user.username, uri, ChatDirection.REPLY, ChatType.IMAGE)
+                    ChatMap[user.id]?.apply { add(message) }
+                }
+            }
+            fail { ToastUtils.showShort("消息文本接收失败") }
+        }
     }
 
     override fun configBinding(): ViewConfig {

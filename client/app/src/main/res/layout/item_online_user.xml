@@ -4,10 +4,11 @@
     <data>
         <variable
                 name="user"
-                type="com.baymax104.chatapp.entity.User" />
+                type="com.baymax104.chatapp.entity.OnlineUser" />
         <variable
                 name="itemClick"
                 type="com.baymax104.basemvvm.view.BaseAdapter.ListHandlerFactory.OnItemClickListener" />
+        <import type="android.view.View"/>
     </data>
 
     <LinearLayout
@@ -17,22 +18,33 @@
             android:paddingHorizontal="10dp"
             android:layout_marginVertical="5dp"
             android:onClick="@{v->itemClick.onClick(user, v)}">
-        <TextView
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="@{user.username}"
-                android:gravity="center_vertical"
-                android:textStyle="bold"
-                android:textSize="17sp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/normal"/>
+                android:layout_weight="1">
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{user.user.username}"
+                    android:gravity="center_vertical"
+                    android:textStyle="bold"
+                    android:textSize="17sp"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/normal"/>
+            <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:src="@drawable/shape_notice"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:visibility="@{user.notice ? View.VISIBLE : View.INVISIBLE}"/>
+        </RelativeLayout>
 
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:text="@{user.gender + ` ` + ((!user.age.equals(``)) ? user.age + `岁` : ``)}"
+                android:text="@{user.user.gender + ` ` + ((!user.user.age.equals(``)) ? user.user.age + `岁` : ``)}"
                 android:layout_gravity="center_vertical"
                 android:textSize="15sp"
                 android:textColor="@color/gray_1"

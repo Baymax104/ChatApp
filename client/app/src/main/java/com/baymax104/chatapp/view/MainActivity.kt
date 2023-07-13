@@ -16,7 +16,6 @@ import com.baymax104.basemvvm.view.BindingConfig
 import com.baymax104.basemvvm.view.ViewConfig
 import com.baymax104.basemvvm.vm.State
 import com.baymax104.basemvvm.vm.StateHolder
-import com.baymax104.basemvvm.vm.activityViewModels
 import com.baymax104.basemvvm.vm.applicationViewModels
 import com.baymax104.chatapp.BR
 import com.baymax104.chatapp.R
@@ -25,7 +24,7 @@ import com.baymax104.chatapp.databinding.ActivityMainBinding
 import com.baymax104.chatapp.entity.ChatDirection
 import com.baymax104.chatapp.entity.ChatMessage
 import com.baymax104.chatapp.entity.ChatType
-import com.baymax104.chatapp.entity.User
+import com.baymax104.chatapp.entity.OnlineUser
 import com.baymax104.chatapp.repository.ChatMap
 import com.baymax104.chatapp.repository.CoroutineHolder
 import com.baymax104.chatapp.repository.UserStore
@@ -33,7 +32,6 @@ import com.baymax104.chatapp.service.UserRequester
 import com.baymax104.chatapp.service.WebService
 import com.baymax104.chatapp.utils.CameraUtil
 import com.baymax104.chatapp.utils.Parser
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 
@@ -45,7 +43,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private val infoMessenger by applicationViewModels<InfoActivity.Messenger>()
 
     class States : StateHolder() {
-        val users = State<List<User>>(listOf())
+        val users = State<List<OnlineUser>>(listOf())
         val isUsersEmpty = State(true)
         val username = State("")
         val isForeground = State(false)
@@ -63,10 +61,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
         val refresh = OnRefreshListener { layout ->
             requester.getOnline {
-                success {
-                    states.users.value = it
-                    states.isUsersEmpty.value = it.isEmpty()
-                    ChatMap.init(it)
+                success { users ->
+                    states.users.value = users.map { OnlineUser(it) }
+                    states.isUsersEmpty.value = users.isEmpty()
+                    ChatMap.init(users)
                     layout.finishRefresh()
                 }
                 fail { ToastUtils.showShort(it) }
@@ -76,8 +74,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     inner class ListHandler : ListHandlerFactory() {
 
-        private val itemClick: OnItemClickListener<User> = OnItemClickListener { data, _ ->
-            chatMessenger.user.send(data)
+        private val itemClick: OnItemClickListener<OnlineUser> = OnItemClickListener { data, _ ->
+            chatMessenger.user.send(data.user)
+            data.notice = false
             activity actionStart ChatActivity::class
         }
 
@@ -101,10 +100,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             if (it) {
                 states.username.value = UserStore.username
                 requester.getOnline {
-                    success {
-                        states.users.value = it
-                        states.isUsersEmpty.value = it.isEmpty()
-                        ChatMap.init(it)
+                    success { users ->
+                        states.users.value = users.map { OnlineUser(it) }
+                        states.isUsersEmpty.value = users.isEmpty()
+                        ChatMap.init(users)
                         listenChat()
                     }
                     fail { ToastUtils.showShort(it) }
@@ -115,10 +114,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         infoMessenger.update.observeSend(this) {
             states.username.value = UserStore.username
             requester.getOnline {
-                success {
-                    states.users.value = it
-                    states.isUsersEmpty.value = it.isEmpty()
-                    ChatMap.init(it)
+                success { users ->
+                    states.users.value = users.map { OnlineUser(it) }
+                    states.isUsersEmpty.value = users.isEmpty()
+                    ChatMap.init(users)
                 }
                 fail { ToastUtils.showShort(it) }
             }
@@ -140,9 +139,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         CoroutineHolder.coroutine!!.registerCallback("/chat/text") {
             success { response ->
                 if (states.isForeground.value) {
-                    val user = states.users.value.find { it.id == response.dest.toInt() } ?: return@success
-                    val message = ChatMessage(user.username, Parser.transform(response.body), ChatDirection.REPLY, ChatType.TEXT)
-                    ChatMap[user.id]?.apply { add(message) }
+                    val onlineUser = states.users.value.find { it.user.id == response.src.toInt() } ?: return@success
+                    val message = ChatMessage(onlineUser.user.username, Parser.transform(response.body), ChatDirection.REPLY, ChatType.TEXT)
+                    ChatMap[onlineUser.user.id]?.apply { add(message) }
+                    onlineUser.notice = true
                 }
             }
             fail { ToastUtils.showShort("消息文本接收失败") }
@@ -151,12 +151,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         CoroutineHolder.coroutine!!.registerCallback("/chat/image") {
             success { response ->
                 if (states.isForeground.value) {
-                    val user = states.users.value.find { it.id == response.dest.toInt() } ?: return@success
+                    val onlineUser = states.users.value.find { it.user.id == response.src.toInt() } ?: return@success
                     val bytes = Parser.transform<ByteArray>(response.body)
                     val file = CameraUtil.bytesToFile(bytes) ?: return@success
                     val uri = Uri.fromFile(file)?.toString() ?: return@success
-                    val message = ChatMessage(user.username, uri, ChatDirection.REPLY, ChatType.IMAGE)
-                    ChatMap[user.id]?.apply { add(message) }
+                    val message = ChatMessage(onlineUser.user.username, uri, ChatDirection.REPLY, ChatType.IMAGE)
+                    ChatMap[onlineUser.user.id]?.apply { add(message) }
+                    onlineUser.notice = true
                 }
             }
             fail { ToastUtils.showShort("消息文本接收失败") }

@@ -68,8 +68,8 @@ class InfoActivity : BaseActivity<ActivityInfoBinding>() {
         super.onCreate(savedInstanceState)
         messenger.show.observeSend(this, true) { states.user.value = User(it) }
         exitMessenger.exit.observeSend(this) {
-            UserStore.initUser()
             WebService.exit()
+            UserStore.initUser()
             ActivityStack.finishAll()
         }
     }

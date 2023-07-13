@@ -12,8 +12,6 @@ import com.baymax104.basemvvm.utils.registerLauncher
 import com.baymax104.basemvvm.view.BaseActivity
 import com.baymax104.basemvvm.view.ViewConfig
 import com.baymax104.basemvvm.vm.MessageHolder
-import com.baymax104.basemvvm.vm.Requester
-import com.baymax104.basemvvm.vm.Requester.*
 import com.baymax104.basemvvm.vm.State
 import com.baymax104.basemvvm.vm.StateHolder
 import com.baymax104.basemvvm.vm.activityViewModels
@@ -35,8 +33,6 @@ import com.baymax104.chatapp.service.UserRequester
 import com.baymax104.chatapp.utils.CameraUtil
 import com.baymax104.chatapp.utils.Parser
 import com.baymax104.chatapp.utils.create
-import com.blankj.utilcode.util.FileIOUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.UriUtils
 
@@ -126,7 +122,12 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         CoroutineHolder.coroutine!!.registerCallback("/chat/text") {
             success { it ->
                 if (states.isForeground.value) {
-                    val message = ChatMessage(states.user.value.username, Parser.transform(it.body), REPLY, TEXT)
+                    val message = ChatMessage(
+                        states.user.value.username,
+                        Parser.transform(it.body),
+                        REPLY,
+                        TEXT
+                    )
                     states.messages.value.apply { add(message) }.let { states.messages.value = it }
                 }
             }

@@ -38,12 +38,10 @@ object UserStore : MessageHolder() {
         get() = user.account
         set(value) { user.gender = value }
 
-
     @JvmStatic
     var password: String
         get() = user.password
-        set(value){
-            user.password = value }
+        set(value) { user.password = value }
 
     @JvmStatic
     var user: User

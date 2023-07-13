@@ -139,8 +139,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         CoroutineHolder.coroutine!!.registerCallback("/chat/text") {
             success { response ->
                 if (states.isForeground.value) {
-                    val onlineUser = states.users.value.find { it.user.id == response.src.toInt() } ?: return@success
-                    val message = ChatMessage(onlineUser.user.username, Parser.transform(response.body), ChatDirection.REPLY, ChatType.TEXT)
+                    val onlineUser = states.users.value.find { it.user.id == response.src.toInt() }
+                        ?: return@success
+                    val message = ChatMessage(
+                        onlineUser.user.username,
+                        Parser.transform(response.body),
+                        ChatDirection.REPLY,
+                        ChatType.TEXT
+                    )
                     ChatMap[onlineUser.user.id]?.apply { add(message) }
                     onlineUser.notice = true
                 }
@@ -151,11 +157,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         CoroutineHolder.coroutine!!.registerCallback("/chat/image") {
             success { response ->
                 if (states.isForeground.value) {
-                    val onlineUser = states.users.value.find { it.user.id == response.src.toInt() } ?: return@success
+                    val onlineUser = states.users.value.find { it.user.id == response.src.toInt() }
+                        ?: return@success
                     val bytes = Parser.transform<ByteArray>(response.body)
                     val file = CameraUtil.bytesToFile(bytes) ?: return@success
                     val uri = Uri.fromFile(file)?.toString() ?: return@success
-                    val message = ChatMessage(onlineUser.user.username, uri, ChatDirection.REPLY, ChatType.IMAGE)
+                    val message = ChatMessage(
+                        onlineUser.user.username,
+                        uri,
+                        ChatDirection.REPLY,
+                        ChatType.IMAGE
+                    )
                     ChatMap[onlineUser.user.id]?.apply { add(message) }
                     onlineUser.notice = true
                 }
@@ -181,7 +193,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0){
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0) {
             WebService.exit()
             ActivityStack.finishAll()
             return true

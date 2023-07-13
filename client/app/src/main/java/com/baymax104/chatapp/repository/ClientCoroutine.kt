@@ -1,14 +1,11 @@
 package com.baymax104.chatapp.repository
 
-import com.baymax104.basemvvm.vm.MessageHolder
-import com.baymax104.basemvvm.vm.MessageHolder.Event
 import com.baymax104.basemvvm.vm.Requester.ReqCallback
-import com.baymax104.chatapp.exception.WebException
 import com.baymax104.chatapp.entity.Response
+import com.baymax104.chatapp.exception.WebException
 import com.baymax104.chatapp.utils.IOUtil
 import com.baymax104.chatapp.utils.Parser
 import com.blankj.utilcode.util.LogUtils
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +13,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.Socket
-import java.net.SocketException
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -42,8 +38,10 @@ class ClientCoroutine(val socket: Socket) : CoroutineScope {
                         IOUtil.read(socket.getInputStream())
                     }
                     val response = Parser.decode<Response<Any>>(json)
-                    LogUtils.iTag("chat-web",
-                        "accept {status=${response.status}, path=${response.path}, src=${response.src}, dest=${response.dest}} in ClientCoroutine")
+                    LogUtils.iTag(
+                        "chat-web",
+                        "accept {status=${response.status}, path=${response.path}, src=${response.src}, dest=${response.dest}} in ClientCoroutine"
+                    )
 
                     // judge status
                     if (response.status != "success") {
@@ -58,7 +56,7 @@ class ClientCoroutine(val socket: Socket) : CoroutineScope {
                     if (!response.path.startsWith("/chat")) {
                         unregisterCallback(response.path)
                     }
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     if (e is WebException) {
                         val response = e.response
                         withContext(Dispatchers.Main) {

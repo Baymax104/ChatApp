@@ -61,7 +61,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
         )
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0){
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0) {
             ActivityStack.finishAll()
             return true
         }

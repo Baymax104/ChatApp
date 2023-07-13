@@ -48,7 +48,7 @@ class WelcomeActivity : BaseActivity<ActivityWelcomeBinding>() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0 ){
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.repeatCount == 0) {
             return true
         }
         return super.onKeyDown(keyCode, event)

@@ -11,7 +11,6 @@ import com.baymax104.chatapp.utils.IOUtil
 import com.baymax104.chatapp.utils.Parser
 import com.baymax104.chatapp.utils.mainLaunch
 import com.blankj.utilcode.util.LogUtils
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetAddress
@@ -32,45 +31,52 @@ object WebService {
      * @param request [Request]对象
      * @param block [ReqCallback]回调
      */
-    fun requestOnce(request: Request<Any>, block: ReqCallback<Response<Any>>.() -> Unit) = mainLaunch {
-        val json = Parser.encode(request)
-        val callback = ReqCallback<Response<Any>>().apply(block)
-        // 已经存在后台协程，不需要注册或登录
-        if (CoroutineHolder.coroutine != null) {
-            callback.onSuccess(Response("success", "200", body = UserStore.user))
-            return@mainLaunch
-        }
-        try {
-            val response = withContext(Dispatchers.IO) {
-                val socket = Socket(InetAddress.getByName(AppKey.SERVER_IP), AppKey.SERVER_PORT)
-                callback.lifeCycle.onStart()
-
-                // 注册和登录是客户端与服务端主线程通信，且都是及时回复
-                IOUtil.write(json, socket.getOutputStream())
-                LogUtils.iTag("chat-web", "request {src=${request.src}, dest=${request.dest}, path=${request.path}}")
-                // 等待Server回复
-                val res = IOUtil.read(socket.getInputStream())
-                val response = Parser.decode<Response<Any>>(res)
-                LogUtils.iTag("chat-web", "accept {status=${response.status}, path=${response.path}, src=${response.src}, dest=${response.dest}}")
-                if (response.status != "success") {
-                    throw Exception("Error${response.code}: ${response.message}")
-                }
-                // 开启客户端后台协程并保存
-                if (request.path == "/login") {
-                    val coroutine = ClientCoroutine(socket)
-                    coroutine.start()
-                    CoroutineHolder.coroutine = coroutine
-                }
-                response
+    fun requestOnce(request: Request<Any>, block: ReqCallback<Response<Any>>.() -> Unit) =
+        mainLaunch {
+            val json = Parser.encode(request)
+            val callback = ReqCallback<Response<Any>>().apply(block)
+            // 已经存在后台协程，不需要注册或登录
+            if (CoroutineHolder.coroutine != null) {
+                callback.onSuccess(Response("success", "200", body = UserStore.user))
+                return@mainLaunch
             }
-            callback.onSuccess(response)
-        } catch (e: Exception) {
-            callback.onFail(e.message ?: "requestOnce Error")
-            LogUtils.eTag("chat-web", "requestOnce Error")
-        } finally {
-            callback.lifeCycle.onFinish()
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    val socket = Socket(InetAddress.getByName(AppKey.SERVER_IP), AppKey.SERVER_PORT)
+                    callback.lifeCycle.onStart()
+
+                    // 注册和登录是客户端与服务端主线程通信，且都是及时回复
+                    IOUtil.write(json, socket.getOutputStream())
+                    LogUtils.iTag(
+                        "chat-web",
+                        "request {src=${request.src}, dest=${request.dest}, path=${request.path}}"
+                    )
+                    // 等待Server回复
+                    val res = IOUtil.read(socket.getInputStream())
+                    val response = Parser.decode<Response<Any>>(res)
+                    LogUtils.iTag(
+                        "chat-web",
+                        "accept {status=${response.status}, path=${response.path}, src=${response.src}, dest=${response.dest}}"
+                    )
+                    if (response.status != "success") {
+                        throw Exception("Error${response.code}: ${response.message}")
+                    }
+                    // 开启客户端后台协程并保存
+                    if (request.path == "/login") {
+                        val coroutine = ClientCoroutine(socket)
+                        coroutine.start()
+                        CoroutineHolder.coroutine = coroutine
+                    }
+                    response
+                }
+                callback.onSuccess(response)
+            } catch (e: Exception) {
+                callback.onFail(e.message ?: "requestOnce Error")
+                LogUtils.eTag("chat-web", "requestOnce Error")
+            } finally {
+                callback.lifeCycle.onFinish()
+            }
         }
-    }
 
     /**
      * 连接建立后，使用通信协程进行请求
@@ -87,7 +93,10 @@ object WebService {
                     CoroutineHolder.coroutine!!.registerCallback(request.path, callback)
                     val socket = CoroutineHolder.coroutine!!.socket
                     IOUtil.write(json, socket.getOutputStream())
-                    LogUtils.iTag("chat-web", "request {src=${request.src}, dest=${request.dest}, path=${request.path}}")
+                    LogUtils.iTag(
+                        "chat-web",
+                        "request {src=${request.src}, dest=${request.dest}, path=${request.path}}"
+                    )
                 }
             }.onFailure {
                 callback.onFail(it.message ?: "request Error")
@@ -108,7 +117,10 @@ object WebService {
                     CoroutineHolder.coroutine!!.callbacks.clear()
                     val socket = CoroutineHolder.coroutine!!.socket
                     IOUtil.write(json, socket.getOutputStream())
-                    LogUtils.iTag("chat-web", "request {src=${request.src}, dest=${request.dest}, path=${request.path}}")
+                    LogUtils.iTag(
+                        "chat-web",
+                        "request {src=${request.src}, dest=${request.dest}, path=${request.path}}"
+                    )
                 }
             }.onFailure {
                 LogUtils.eTag("chat-web", it.message ?: "request Error")
@@ -124,7 +136,10 @@ object WebService {
                 withContext(Dispatchers.IO) {
                     val socket = CoroutineHolder.coroutine!!.socket
                     IOUtil.write(json, socket.getOutputStream())
-                    LogUtils.iTag("chat-web", "request {src=${request.src}, dest=${request.dest}, path=${request.path}}")
+                    LogUtils.iTag(
+                        "chat-web",
+                        "request {src=${request.src}, dest=${request.dest}, path=${request.path}}"
+                    )
                 }
             }.onFailure {
                 LogUtils.eTag("chat-web", it.message ?: "request Error")

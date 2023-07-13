@@ -9,7 +9,8 @@ import com.baymax104.chatapp.entity.OnlineUser
  * 用户列表Adapter
  * @author John
  */
-class OnlineUserAdapter : BaseAdapter<OnlineUser, ItemOnlineUserBinding>(R.layout.item_online_user) {
+class OnlineUserAdapter :
+    BaseAdapter<OnlineUser, ItemOnlineUserBinding>(R.layout.item_online_user) {
     override fun onBind(binding: ItemOnlineUserBinding, item: OnlineUser) {
         binding.user = item
     }

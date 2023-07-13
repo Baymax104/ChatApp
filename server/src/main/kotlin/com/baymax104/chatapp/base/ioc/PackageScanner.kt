@@ -23,7 +23,8 @@ object PackageScanner {
                     val className = PathUtil.getName(it).replace(".class", "")
                     val clazz = Class.forName("$packageName.$className")
                     if (!clazz.isInterface && !Modifier.isAbstract(clazz.modifiers)
-                        && clazz.isAnnotationPresent(annotationClass.java)) {
+                        && clazz.isAnnotationPresent(annotationClass.java)
+                    ) {
                         classes += clazz
                     }
                 }

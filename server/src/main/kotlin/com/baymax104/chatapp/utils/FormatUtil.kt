@@ -1,7 +1,7 @@
 package com.baymax104.chatapp.utils
 
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 
 /**

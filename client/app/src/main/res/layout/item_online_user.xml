@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:text="@{user.gender + ` ` + user.age + `岁`}"
+                android:text="@{user.gender + ` ` + ((!user.age.equals(``)) ? user.age + `岁` : ``)}"
                 android:layout_gravity="center_vertical"
                 android:textSize="15sp"
                 android:textColor="@color/gray_1"

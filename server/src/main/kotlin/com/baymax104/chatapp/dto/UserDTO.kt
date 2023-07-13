@@ -9,7 +9,7 @@ class UserDTO() {
 
     var id: Int = 0
     var username: String = ""
-    var age: Int = 0
+    var age: String = ""
     var gender: String = ""
     var account: String = ""
     var password: String = ""

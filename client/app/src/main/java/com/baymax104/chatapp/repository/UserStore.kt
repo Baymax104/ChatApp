@@ -29,6 +29,11 @@ object UserStore : MessageHolder() {
         set(value) { user.gender = value }
 
     @JvmStatic
+    var age: String
+        get() = user.age
+        set(value) { user.age = value }
+
+    @JvmStatic
     var account: String
         get() = user.account
         set(value) { user.gender = value }

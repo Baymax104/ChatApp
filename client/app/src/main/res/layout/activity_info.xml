@@ -53,7 +53,7 @@
 
         <TextView
                 android:layout_width="match_parent"
-                android:layout_height="55dp"
+                android:layout_height="45dp"
                 android:text="@{`用户ID：`+state.user.id}"
                 android:gravity="start"
                 android:layout_marginTop="50dp"
@@ -65,7 +65,7 @@
                 android:fontFamily="@font/normal"/>
         <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="45dp"
                 android:text="@{`账号：`+state.user.account}"
                 android:gravity="start"
                 android:layout_marginBottom="10dp"
@@ -87,8 +87,8 @@
             <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="phone"
-                    android:textSize="16sp"
+                    android:inputType="text"
+                    android:textSize="15sp"
                     android:textColor="@color/black"
                     tools:ignore="SpeakableTextPresentCheck"
                     android:text="@{state.user.username}"
@@ -107,8 +107,8 @@
             <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="phone"
-                    android:textSize="16sp"
+                    android:inputType="text"
+                    android:textSize="15sp"
                     android:textColor="@color/black"
                     tools:ignore="SpeakableTextPresentCheck"
                     android:text="@{state.user.gender}"
@@ -128,7 +128,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="phone"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textColor="@color/black"
                     tools:ignore="SpeakableTextPresentCheck"
                     android:text="@{state.user.age}"

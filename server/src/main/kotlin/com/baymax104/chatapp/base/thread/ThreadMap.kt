@@ -12,6 +12,8 @@ object ThreadMap {
 
     val size get() = map.size
 
+    val keys get() = map.keys.toList()
+
     operator fun set(id: Int, thread: ServerThread) {
         map[id] = thread
     }

@@ -27,7 +27,7 @@ class User() : BaseObservable(), Parcelable {
         }
 
     @get:Bindable
-    var age: Int = 0
+    var age: String = ""
         set(value) {
             field = value
             notifyPropertyChanged(BR.age)
@@ -54,10 +54,21 @@ class User() : BaseObservable(), Parcelable {
             notifyPropertyChanged(BR.password)
         }
 
+    constructor(user: User) : this() {
+        user.let {
+            id = it.id
+            username = it.username
+            age = it.age
+            gender = it.gender
+            account = it.account
+            password = it.password
+        }
+    }
+
     constructor(parcel: Parcel) : this() {
         id = parcel.readInt()
         username = parcel.readString() ?: ""
-        age = parcel.readInt()
+        age = parcel.readString() ?: ""
         gender = parcel.readString() ?: ""
         account = parcel.readString() ?: ""
         password = parcel.readString() ?: ""
@@ -69,7 +80,7 @@ class User() : BaseObservable(), Parcelable {
         with(dest) {
             writeInt(id)
             writeString(username)
-            writeInt(age)
+            writeString(age)
             writeString(gender)
             writeString(account)
             writeString(password)

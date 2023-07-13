@@ -16,7 +16,7 @@ object Users : Table<User>("users") {
     val password = varchar("password").bindTo { it.password }
     val username = varchar("username").bindTo { it.username }
     val gender = varchar("gender").bindTo { it.gender }
-    val age = int("age").bindTo { it.age }
+    val age = varchar("age").bindTo { it.age }
 }
 
 val Database.users get() = sequenceOf(Users)

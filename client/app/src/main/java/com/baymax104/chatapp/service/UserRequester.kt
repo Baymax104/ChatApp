@@ -24,10 +24,7 @@ class UserRequester : Requester() {
         val request = Request("/login", body = map)
         val req = Parser.transform<Request<Any>>(request)
         WebService.requestOnce(req) {
-            success {
-                val res = Parser.transform<User>(it.body)
-                callback.onSuccess(res)
-            }
+            success { it -> Parser.transform<User>(it.body).let { callback.onSuccess(it) } }
             fail { callback.onFail(it) }
         }
     }
@@ -42,10 +39,7 @@ class UserRequester : Requester() {
         val request = Request("/register", body = map)
         val req = Parser.transform<Request<Any>>(request)
         WebService.requestOnce(req) {
-            success {
-                val res = Parser.transform<Any>(it.body)
-                callback.onSuccess(res)
-            }
+            success { it -> Parser.transform<Any>(it.body).let { callback.onSuccess(it) } }
             fail { callback.onFail(it) }
         }
     }
@@ -54,10 +48,17 @@ class UserRequester : Requester() {
         val callback = ReqCallback<List<User>>().apply(block)
         val request = Request<Any>("/online", src = UserStore.id.toString())
         WebService.request(request) {
-            success {
-                val res = Parser.transform<List<User>>(it.body)
-                callback.onSuccess(res)
-            }
+            success { it -> Parser.transform<List<User>>(it.body).let { callback.onSuccess(it) } }
+            fail { callback.onFail(it) }
+        }
+    }
+
+    fun updateInfo(user: User, block: ReqCallback<Any>.() -> Unit) {
+        val callback = ReqCallback<Any>().apply(block)
+        val request = Request("/update", src = UserStore.id.toString(), body = user)
+        val req = Parser.transform<Request<Any>>(request)
+        WebService.request(req) {
+            success { it -> Parser.transform<Any>(it.body).let { callback.onSuccess(it) } }
             fail { callback.onFail(it) }
         }
     }

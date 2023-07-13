@@ -47,7 +47,8 @@
                 android:id="@+id/refresh"
                 app:srlEnablePreviewInEditMode="true"
                 app:srlPrimaryColor="@color/main_color"
-                app:srlAccentColor="@color/white">
+                app:srlAccentColor="@color/white"
+                refresh_onRefresh="@{handler.refresh}">
             <com.scwang.smart.refresh.header.ClassicsHeader
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

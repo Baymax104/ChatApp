@@ -2,7 +2,6 @@ package com.baymax104.chatapp.view
 
 import android.os.Bundle
 import android.view.View.OnClickListener
-import androidx.core.text.isDigitsOnly
 import androidx.databinding.adapters.TextViewBindingAdapter.AfterTextChanged
 import com.baymax104.basemvvm.view.BaseActivity
 import com.baymax104.basemvvm.view.ViewConfig
@@ -15,12 +14,15 @@ import com.baymax104.chatapp.BR
 import com.baymax104.chatapp.R
 import com.baymax104.chatapp.databinding.ActivityInfoBinding
 import com.baymax104.chatapp.entity.User
+import com.baymax104.chatapp.repository.UserStore
+import com.baymax104.chatapp.service.UserRequester
+import com.blankj.utilcode.util.ToastUtils
 
 class InfoActivity : BaseActivity<ActivityInfoBinding>() {
 
     private val states by activityViewModels<States>()
-
     private val messenger by applicationViewModels<Messenger>()
+    private val requester by applicationViewModels<UserRequester>()
 
 
     class States : StateHolder() {
@@ -34,14 +36,18 @@ class InfoActivity : BaseActivity<ActivityInfoBinding>() {
     inner class Handler {
 
         val confirm = OnClickListener {
-
+            requester.updateInfo(states.user.value) {
+                success {
+                    UserStore.setUserInfo(states.user.value)
+                    finish()
+                }
+                fail { ToastUtils.showShort(it) }
+            }
         }
 
         val setUsername = AfterTextChanged { states.user.value.username = it.toString() }
         val setGender = AfterTextChanged { states.user.value.gender = it.toString() }
-        val setAge = AfterTextChanged {
-            states.user.value.age = if (it.toString().isDigitsOnly()) it.toString().toInt() else 0
-        }
+        val setAge = AfterTextChanged { states.user.value.age = it.toString() }
     }
 
     override fun configBinding(): ViewConfig {
@@ -53,7 +59,7 @@ class InfoActivity : BaseActivity<ActivityInfoBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        messenger.show.observeSend(this, true) { states.user.value = it }
+        messenger.show.observeSend(this, true) { states.user.value = User(it) }
     }
 
     override fun configWindow(): WindowConfig {

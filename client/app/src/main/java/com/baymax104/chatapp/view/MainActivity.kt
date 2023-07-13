@@ -3,7 +3,7 @@ package com.baymax104.chatapp.view
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import com.baymax104.basemvvm.utils.actionStart
 import com.baymax104.basemvvm.view.ActivityStack
 import com.baymax104.basemvvm.view.BaseActivity
@@ -24,12 +24,14 @@ import com.baymax104.chatapp.repository.UserStore
 import com.baymax104.chatapp.service.UserRequester
 import com.baymax104.chatapp.service.WebService
 import com.blankj.utilcode.util.ToastUtils
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     private val states by activityViewModels<States>()
     private val chatMessenger by applicationViewModels<ChatActivity.Messenger>()
     private val requester by applicationViewModels<UserRequester>()
+    private val infoMessenger by applicationViewModels<InfoActivity.Messenger>()
 
     class States : StateHolder() {
         val users = State<List<User>>(listOf())
@@ -37,12 +39,24 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     inner class Handler {
-        val menuClick = Toolbar.OnMenuItemClickListener { item ->
+        val menuClick = OnMenuItemClickListener { item ->
             val id = item.itemId
             if (id == R.id.menu_user) {
-                activity actionStart ChatActivity::class
+                infoMessenger.show.send(UserStore.user)
+                activity actionStart InfoActivity::class
             }
             true
+        }
+
+        val refresh = OnRefreshListener { layout ->
+            requester.getOnline {
+                success {
+                    states.users.value = it
+                    states.isUsersEmpty.value = it.isEmpty()
+                    layout.finishRefresh()
+                }
+                fail { ToastUtils.showShort(it) }
+            }
         }
     }
 
@@ -97,9 +111,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun configUIComponent(binding: ActivityMainBinding) {
         binding.state.onEmpty {
             findViewById<TextView>(R.id.empty_txt)?.apply { text = it as String? }
-        }
-        binding.refresh.setOnRefreshListener {
-            ToastUtils.showShort("来了")
         }
     }
 

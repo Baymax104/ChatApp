@@ -12,7 +12,7 @@ interface User : Entity<User> {
 
     var id: Int
     var username: String
-    var age: Int
+    var age: String
     var gender: String
     var account: String
     var password: String

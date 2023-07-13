@@ -50,13 +50,14 @@
     <!--对话框按钮文字样式-->
     <style name="DialogButtonTextStyle">
         <item name="android:fontFamily">@font/normal</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:gravity">center</item>
     </style>
 
     <style name="DialogContentTextStyle">
-        <item name="android:textSize">17sp</item>
+        <item name="android:fontFamily">@font/normal</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/black</item>
     </style>
 

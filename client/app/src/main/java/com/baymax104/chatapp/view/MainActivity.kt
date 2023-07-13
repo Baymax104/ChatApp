@@ -75,7 +75,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        UserStore.userLoginEvent.observeSend(this) { it ->
+        UserStore.userLoginEvent.observeSend(this, true) { it ->
             if (it) {
                 requester.getOnline {
                     success {

@@ -18,4 +18,6 @@
     <string name="take_photo">拍照</string>
     <string name="confirm">确定</string>
     <string name="welcome">欢迎</string>
+    <string name="exit">退出登录</string>
+    <string name="exit_confirm">确定要退出登录吗</string>
 </resources>

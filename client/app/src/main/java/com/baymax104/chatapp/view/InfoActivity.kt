@@ -3,6 +3,7 @@ package com.baymax104.chatapp.view
 import android.os.Bundle
 import android.view.View.OnClickListener
 import androidx.databinding.adapters.TextViewBindingAdapter.AfterTextChanged
+import com.baymax104.basemvvm.view.ActivityStack
 import com.baymax104.basemvvm.view.BaseActivity
 import com.baymax104.basemvvm.view.ViewConfig
 import com.baymax104.basemvvm.vm.MessageHolder
@@ -16,6 +17,8 @@ import com.baymax104.chatapp.databinding.ActivityInfoBinding
 import com.baymax104.chatapp.entity.User
 import com.baymax104.chatapp.repository.UserStore
 import com.baymax104.chatapp.service.UserRequester
+import com.baymax104.chatapp.service.WebService
+import com.baymax104.chatapp.utils.create
 import com.blankj.utilcode.util.ToastUtils
 
 class InfoActivity : BaseActivity<ActivityInfoBinding>() {
@@ -23,7 +26,7 @@ class InfoActivity : BaseActivity<ActivityInfoBinding>() {
     private val states by activityViewModels<States>()
     private val messenger by applicationViewModels<Messenger>()
     private val requester by applicationViewModels<UserRequester>()
-
+    private val exitMessenger by applicationViewModels<ExitDialog.Messenger>()
 
     class States : StateHolder() {
         val user = State(User())
@@ -45,6 +48,8 @@ class InfoActivity : BaseActivity<ActivityInfoBinding>() {
             }
         }
 
+        val exit = OnClickListener { create(ExitDialog::class).show() }
+
         val setUsername = AfterTextChanged { states.user.value.username = it.toString() }
         val setGender = AfterTextChanged { states.user.value.gender = it.toString() }
         val setAge = AfterTextChanged { states.user.value.age = it.toString() }
@@ -60,6 +65,11 @@ class InfoActivity : BaseActivity<ActivityInfoBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         messenger.show.observeSend(this, true) { states.user.value = User(it) }
+        exitMessenger.exit.observeSend(this) {
+            UserStore.initUser()
+            WebService.exit()
+            ActivityStack.finishAll()
+        }
     }
 
     override fun configWindow(): WindowConfig {
